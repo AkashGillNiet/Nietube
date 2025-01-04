@@ -1,273 +1,249 @@
-<!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HD Stream</title>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-8PT3Z7SY6Y"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-8PT3Z7SY6Y');
+  </script>
+  <meta charset="UTF-8">
+  <title>HD Stream</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script disable-devtool-auto src="https://cdn.jsdelivr.net/npm/disable-devtool@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.8/shaka-player.compiled.js"></script>
+  <style>
+    /* पूरे पेज का काला बैकग्राउंड */
+    body {
+      margin: 0;
+      background-color: #000; /* काला रंग */
+      color: #fff; /* सफेद टेक्स्ट */
+    }
 
-    <!-- Firebase and Shaka Player -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8PT3Z7SY6Y"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.8/shaka-player.compiled.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+    /* वीडियो प्लेयर का कंटेनर */
+    #videoContainer {
+      width: 95%; /* चौड़ाई 95% */
+      height: 200px; /* ऊँचाई 200px */
+      margin: 20px auto; /* ऊपर-नीचे और सेंटर्ड */
+      background-color: #000; /* काला रंग */
+      border: 2px solid #fff; /* सफेद बॉर्डर */
+      border-radius: 10px; /* गोल किनारे */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      box-shadow: 0px 4px 8px rgba(255, 255, 255, 0.2); /* सफेद हल्का शैडो */
+    }
 
-    <style>
-        /* Body and Video Container */
-        body {
-            margin: 0;
-            background-color: #000;
-            color: #fff;
-        }
+    /* वीडियो */
+    video {
+      width: 100%;
+      height: 100%;
+      border: 2px solid #fff; /* सफेद बॉर्डर */
+      border-radius: 8px; /* हल्के गोल किनारे */
+    }
 
-        #videoContainer {
-            width: 95%;
-            height: 200px;
-            margin: 20px auto;
-            background-color: #000;
-            border: 2px solid #fff;
-            border-radius: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            box-shadow: 0px 4px 8px rgba(255, 255, 255, 0.2);
-        }
+    /* बटन कंटेनर */
+    .button-container {
+      text-align: center;
+      margin-top: 10px;
+    }
 
-        video {
-            width: 100%;
-            height: 100%;
-            border: 2px solid #fff;
-            border-radius: 8px;
-        }
+    .button-group {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      font-size: 24px;
+      cursor: pointer;
+      color: white;
+    }
 
-        /* Buttons and Chat Box */
-        .button-container {
-            text-align: center;
-            margin-top: 10px;
-        }
+    .button {
+      border: none;
+      background: none;
+      color: white;
+      font-size: 30px;
+      padding: 10px;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
 
-        .button-group {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            font-size: 24px;
-            cursor: pointer;
-        }
+    .button:active {
+      transform: scale(0.9);
+    }
 
-        .button {
-            border: none;
-            background: none;
-            color: white;
-            font-size: 30px;
-            padding: 10px;
-            cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
+    .button.selected {
+      box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.5);
+    }
 
-        .button:active {
-            transform: scale(0.9);
-        }
+    /* बटन के नीचे काउंट */
+    .count {
+      display: none;
+      font-size: 18px;
+      margin-top: 5px;
+    }
 
-        .button.selected {
-            box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.5);
-        }
+    /* चैट बॉक्स */
+    #chatBox {
+      display: none;
+      width: 300px;
+      height: 400px;
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      background-color: #333;
+      color: white;
+      border-radius: 10px;
+      overflow-y: auto;
+      padding: 10px;
+      z-index: 9999;
+    }
 
-        .count {
-            display: none;
-            font-size: 18px;
-            margin-top: 5px;
-        }
-
-        #chatBox {
-            display: none;
-            width: 100%;
-            height: 150px;
-            background-color: #333;
-            color: white;
-            border-radius: 10px;
-            overflow-y: auto;
-            padding: 10px;
-            margin-top: 20px;
-        }
-    </style>
+    #chatButton:active {
+      transform: scale(0.9);
+    }
+  </style>
 </head>
 
 <body>
+  <div id="videoContainer">
+    <video id="video" autoplay controls></video>
+  </div>
 
-    <div id="videoContainer">
-        <video id="video" autoplay controls></video>
+  <div class="button-container">
+    <div class="button-group">
+      <!-- Like Button -->
+      <button class="button" id="likeButton">👍</button>
+      <div class="count" id="likeCount">0</div>
+
+      <!-- Dislike Button -->
+      <button class="button" id="dislikeButton">👎</button>
+      <div class="count" id="dislikeCount">0</div>
+
+      <!-- Chat Button -->
+      <button class="button" id="chatButton">💬</button>
+
+      <!-- Share Button -->
+      <button class="button" id="shareButton">🔗</button>
     </div>
+  </div>
 
-    <div class="button-container">
-        <div class="button-group">
-            <!-- Like Button -->
-            <button class="button" id="likeButton">👍</button>
-            <div class="count" id="likeCount">0</div>
+  <!-- Chatango Script Embed -->
+  <script id="cid0020000396987801918" data-cfasync="false" async src="//st.chatango.com/js/gz/emb.js" style="width: 250px;height: 350px;">
+    {"handle":"cricpm","arch":"js","styles":{"a":"000000","b":100,"c":"FFFFFF","d":"FFFFFF","k":"000000","l":"000000","m":"000000","n":"FFFFFF","p":"10","q":"000000","r":100}}
+  </script>
 
-            <!-- Dislike Button -->
-            <button class="button" id="dislikeButton">👎</button>
-            <div class="count" id="dislikeCount">0</div>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const video = document.getElementById('video');
+      const manifestUri = "https://dd.livecricketsl.xyz/hls/skyc.php/get/index.m3u8";
 
-            <!-- Chat Button -->
-            <button class="button" id="chatButton">💬</button>
+      // Initialize Shaka Player
+      const player = new shaka.Player(video);
 
-            <!-- Share Button -->
-            <button class="button" id="shareButton">🔗</button>
-        </div>
+      // Error handling
+      player.addEventListener('error', (event) => {
+        console.error('Error code', event.detail.code, 'object', event.detail);
+      });
 
-        <!-- Chat Box -->
-        <div id="chatBox">
-            <p>Stream chat...</p>
-            <input type="text" id="chatInput" placeholder="Type your message..." />
-        </div>
-    </div>
+      try {
+        // Load the video manifest
+        await player.load(manifestUri);
+        console.log('The video has successfully loaded!');
+      } catch (error) {
+        console.error('Error loading video', error);
+      }
+    });
 
-    <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyB0Qyre-zCihH7BsVrEcCpGlJKiS0NzYUg",
-            authDomain: "niet-12.firebaseapp.com",
-            projectId: "niet-12",
-            storageBucket: "niet-12.firebasestorage.app",
-            messagingSenderId: "297924286618",
-            appId: "1:297924286618:web:fb72959536dc6e56e7a723",
-            measurementId: "G-WP702ZZYLW"
-        };
+    let likeCount = 0;
+    let dislikeCount = 0;
+    let isLiked = false;
+    let isDisliked = false;
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database(app);
+    // Like button interaction
+    document.getElementById('likeButton').addEventListener('click', () => {
+      if (!isLiked) {
+        likeCount++;
+        document.getElementById('likeCount').textContent = likeCount;
+        document.getElementById('likeCount').style.display = 'block';
+        document.getElementById('likeButton').classList.add('selected');
+        isLiked = true;
 
-        // Chat Box Reference
-        const chatBox = document.getElementById('chatBox');
-        const chatInput = document.getElementById('chatInput');
-        const chatButton = document.getElementById('chatButton');
-        const video = document.getElementById('video');
-        const manifestUri = "https://dd.livecricketsl.xyz/hls/skyc.php/get/index.m3u8";
+        // Remove dislike shadow if already disliked
+        if (isDisliked) {
+          document.getElementById('dislikeButton').classList.remove('selected');
+          isDisliked = false;
+          dislikeCount--;
+          document.getElementById('dislikeCount').textContent = dislikeCount;
+          document.getElementById('dislikeCount').style.display = 'none';
+        }
+      } else {
+        likeCount--;
+        document.getElementById('likeCount').textContent = likeCount;
+        if (likeCount === 0) {
+          document.getElementById('likeCount').style.display = 'none';
+        }
+        document.getElementById('likeButton').classList.remove('selected');
+        isLiked = false;
+      }
+    });
 
-        // Initialize Shaka Player
-        const player = new shaka.Player(video);
+    // Dislike button interaction
+    document.getElementById('dislikeButton').addEventListener('click', () => {
+      if (!isDisliked) {
+        dislikeCount++;
+        document.getElementById('dislikeCount').textContent = dislikeCount;
+        document.getElementById('dislikeCount').style.display = 'block';
+        document.getElementById('dislikeButton').classList.add('selected');
+        isDisliked = true;
 
-        // Load video
-        player.load(manifestUri).then(() => {
-            console.log('The video has successfully loaded!');
-        }).catch((error) => {
-            console.error('Error loading video', error);
-        });
+        // Remove like shadow if already liked
+        if (isLiked) {
+          document.getElementById('likeButton').classList.remove('selected');
+          isLiked = false;
+          likeCount--;
+          document.getElementById('likeCount').textContent = likeCount;
+          if (likeCount === 0) {
+            document.getElementById('likeCount').style.display = 'none';
+          }
+        }
+      } else {
+        dislikeCount--;
+        document.getElementById('dislikeCount').textContent = dislikeCount;
+        if (dislikeCount === 0) {
+          document.getElementById('dislikeCount').style.display = 'none';
+        }
+        document.getElementById('dislikeButton').classList.remove('selected');
+        isDisliked = false;
+      }
+    });
 
-        // Like/Dislike Counting and Behavior
-        let likeCount = 0;
-        let dislikeCount = 0;
-        let isLiked = false;
-        let isDisliked = false;
+    // Share button interaction
+    document.getElementById('shareButton').addEventListener('click', () => {
+      const url = window.location.href;
+      navigator.clipboard.writeText(url).then(() => {
+        alert("URL copied to clipboard!");
+      });
+    });
 
-        // Like button functionality
-        document.getElementById('likeButton').addEventListener('click', () => {
-            if (!isLiked) {
-                likeCount++;
-                document.getElementById('likeCount').textContent = likeCount;
-                document.getElementById('likeCount').style.display = 'block';
-                document.getElementById('likeButton').classList.add('selected');
-                isLiked = true;
+    // Chat button interaction
+    document.getElementById('chatButton').addEventListener('click', () => {
+      const chatBox = document.getElementById('chatBox');
+      if (chatBox.style.display === 'none') {
+        chatBox.style.display = 'block';
+      } else {
+        chatBox.style.display = 'none';
+      }
+    });
 
-                // If disliked, remove dislike
-                if (isDisliked) {
-                    document.getElementById('dislikeButton').classList.remove('selected');
-                    isDisliked = false;
-                    dislikeCount--;
-                    document.getElementById('dislikeCount').textContent = dislikeCount;
-                    document.getElementById('dislikeCount').style.display = 'none';
-                }
-            } else {
-                likeCount--;
-                document.getElementById('likeCount').textContent = likeCount;
-                if (likeCount === 0) {
-                    document.getElementById('likeCount').style.display = 'none';
-                }
-                document.getElementById('likeButton').classList.remove('selected');
-                isLiked = false;
-            }
-        });
+    window.addEventListener('load', function() {
+      const result = window.confirm("Join for more updates?");
+      if (result) {
+        window.location.href = "https://t.me/sportslivesrilanka";
+          }
+    });
+  </script>
 
-        // Dislike button functionality
-        document.getElementById('dislikeButton').addEventListener('click', () => {
-            if (!isDisliked) {
-                dislikeCount++;
-                document.getElementById('dislikeCount').textContent = dislikeCount;
-                document.getElementById('dislikeCount').style.display = 'block';
-                document.getElementById('dislikeButton').classList.add('selected');
-                isDisliked = true;
-
-                // If liked, remove like
-                if (isLiked) {
-                    document.getElementById('likeButton').classList.remove('selected');
-                    isLiked = false;
-                    likeCount--;
-                    document.getElementById('likeCount').textContent = likeCount;
-                    if (likeCount === 0) {
-                        document.getElementById('likeCount').style.display = 'none';
-                    }
-                }
-            } else {
-                dislikeCount--;
-                document.getElementById('dislikeCount').textContent = dislikeCount;
-                if (dislikeCount === 0) {
-                    document.getElementById('dislikeCount').style.display = 'none';
-                }
-                document.getElementById('dislikeButton').classList.remove('selected');
-                isDisliked = false;
-            }
-        });
-
-        // Share button functionality
-        document.getElementById('shareButton').addEventListener('click', () => {
-            const url = window.location.href;
-            navigator.clipboard.writeText(url).then(() => {
-                alert("URL copied to clipboard!");
-            });
-        });
-
-        // Chat button functionality
-        chatButton.addEventListener('click', () => {
-            if (chatBox.style.display === 'none') {
-                chatBox.style.display = 'block';
-            } else {
-                chatBox.style.display = 'none';
-            }
-        });
-
-        // Send message functionality
-        chatInput.addEventListener('keypress', (event) => {
-            if (event.key === 'Enter' && chatInput.value.trim() !== '') {
-                const messageText = chatInput.value.trim();
-
-                // Push message to Firebase
-                database.ref('messages').push({
-                    text: messageText
-                });
-
-                // Clear input field
-                chatInput.value = '';
-            }
-        });
-
-        // Listen for new messages in Firebase
-        database.ref('messages').on('child_added', (snapshot) => {
-            const message = snapshot.val();
-            const messageElement = document.createElement('p');
-            messageElement.textContent = message.text;
-            chatBox.appendChild(messageElement);
-        });
-
-        window.addEventListener('load', function () {
-            const result = window.confirm("Join for more updates?");
-            if (result) {
-                window.location.href = "https://t.me/sportslivesrilanka";
-            }
-        });
-    </script>
 </body>
-
 </html>
