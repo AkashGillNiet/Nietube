@@ -17,31 +17,31 @@
     /* पूरे पेज का काला बैकग्राउंड */
     body {
       margin: 0;
-      background-color: #000; /* काला रंग */
-      color: #fff; /* सफेद टेक्स्ट */
+      background-color: #000;
+      color: #fff;
     }
 
     /* वीडियो प्लेयर का कंटेनर */
     #videoContainer {
-      width: 95%; /* चौड़ाई 95% */
-      height: 200px; /* ऊँचाई 200px */
-      margin: 20px auto; /* ऊपर-नीचे और सेंटर्ड */
-      background-color: #000; /* काला रंग */
-      border: 2px solid #fff; /* सफेद बॉर्डर */
-      border-radius: 10px; /* गोल किनारे */
+      width: 95%;
+      height: 200px;
+      margin: 20px auto;
+      background-color: #000;
+      border: 2px solid #fff;
+      border-radius: 10px;
       display: flex;
       justify-content: center;
       align-items: center;
       overflow: hidden;
-      box-shadow: 0px 4px 8px rgba(255, 255, 255, 0.2); /* सफेद हल्का शैडो */
+      box-shadow: 0px 4px 8px rgba(255, 255, 255, 0.2);
     }
 
     /* वीडियो */
     video {
       width: 100%;
       height: 100%;
-      border: 2px solid #fff; /* सफेद बॉर्डर */
-      border-radius: 8px; /* हल्के गोल किनारे */
+      border: 2px solid #fff;
+      border-radius: 8px;
     }
 
     /* बटन कंटेनर */
@@ -87,21 +87,35 @@
     /* चैट बॉक्स */
     #chatBox {
       display: none;
-      width: 300px;
-      height: 400px;
-      position: fixed;
-      right: 20px;
-      bottom: 20px;
+      width: 100%;
+      height: 150px;
       background-color: #333;
       color: white;
       border-radius: 10px;
       overflow-y: auto;
       padding: 10px;
-      z-index: 9999;
+      margin-top: 20px;
     }
 
-    #chatButton:active {
-      transform: scale(0.9);
+    /* Quality Selector Dropdown */
+    #qualityDropdown {
+      display: none;
+      background-color: #444;
+      position: absolute;
+      top: 80px;
+      right: 60px;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.2);
+      z-index: 1000;
+    }
+
+    #qualityDropdown select {
+      background-color: #333;
+      color: white;
+      border: 1px solid #fff;
+      padding: 5px;
+      border-radius: 5px;
     }
   </style>
 </head>
@@ -126,13 +140,26 @@
 
       <!-- Share Button -->
       <button class="button" id="shareButton">🔗</button>
+
+      <!-- Settings Button -->
+      <button class="button" id="settingsButton">⚙️</button>
+    </div>
+
+    <!-- Quality Dropdown -->
+    <div id="qualityDropdown">
+      <select id="qualitySelect">
+        <option value="1080p">1080p</option>
+        <option value="720p">720p</option>
+        <option value="480p">480p</option>
+        <option value="360p">360p</option>
+      </select>
+    </div>
+
+    <!-- Chat Box -->
+    <div id="chatBox">
+      <p>Stream chat...</p>
     </div>
   </div>
-
-  <!-- Chatango Script Embed -->
-  <script id="cid0020000396987801918" data-cfasync="false" async src="//st.chatango.com/js/gz/emb.js" style="width: 250px;height: 350px;">
-    {"handle":"cricpm","arch":"js","styles":{"a":"000000","b":100,"c":"FFFFFF","d":"FFFFFF","k":"000000","l":"000000","m":"000000","n":"FFFFFF","p":"10","q":"000000","r":100}}
-  </script>
 
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
@@ -170,7 +197,6 @@
         document.getElementById('likeButton').classList.add('selected');
         isLiked = true;
 
-        // Remove dislike shadow if already disliked
         if (isDisliked) {
           document.getElementById('dislikeButton').classList.remove('selected');
           isDisliked = false;
@@ -198,7 +224,6 @@
         document.getElementById('dislikeButton').classList.add('selected');
         isDisliked = true;
 
-        // Remove like shadow if already liked
         if (isLiked) {
           document.getElementById('likeButton').classList.remove('selected');
           isLiked = false;
@@ -237,13 +262,24 @@
       }
     });
 
-    window.addEventListener('load', function() {
-      const result = window.confirm("Join for more updates?");
-      if (result) {
-        window.location.href = "https://t.me/sportslivesrilanka";
-          }
+    // Settings button interaction to show quality dropdown
+    document.getElementById('settingsButton').addEventListener('click', () => {
+      const qualityDropdown = document.getElementById('qualityDropdown');
+      if (qualityDropdown.style.display === 'none') {
+        qualityDropdown.style.display = 'block'; // Show the dropdown
+      } else {
+        qualityDropdown.style.display = 'none'; // Hide the dropdown
+      }
+    });
+
+    // Quality selection interaction
+    document.getElementById('qualitySelect').addEventListener('change', (event) => {
+      const selectedQuality = event.target.value;
+      alert("Selected quality: " + selectedQuality);
+      // You can modify your video stream or change the player quality accordingly.
+      // For now, it's just an alert showing the selected quality.
+      // If you need to change the stream quality, you can implement additional logic here.
     });
   </script>
-
 </body>
 </html>
