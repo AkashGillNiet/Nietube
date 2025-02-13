@@ -3,253 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NietSportsLive</title>
+    <title>NietLive</title>
     <style>
         body {
-            background-color: black;
-            color: white;
-            font-family: Arial, sans-serif;
+            background-color: #000; /* Full black background */
             margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            height: 100vh;
-        }
-
-        /* Full-Screen Popup */
-        #popup {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.95);
-            color: white;
-            z-index: 9999;
-            text-align: center;
-        }
-
-        #popup button {
-            margin: 10px;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        #join-now {
-            background-color: #007bff;
-            color: white;
-        }
-        #already-joined {
-            background-color: #28a745;
-            color: white;
+            font-family: Arial, sans-serif;
         }
 
         /* Header */
         #header {
-            font-size: 28px;
-            font-weight: bold;
-            margin: 20px 0;
-            text-align: center;
-            color: white;
+            background-color: #fff; /* White background for the header */
+            color: black;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            align-items: center;
         }
 
-        /* Video Container */
-        #streaming-container {
-            width: 100%;
-            max-width: 800px;
-            margin: 20px auto;
-            text-align: center;
-        }
-        video {
-            width: 100%;
+        #logo {
+            width: 120px;
             height: auto;
-            border: 1px solid white;
         }
 
-        /* Quality Selector */
-        #quality-selector {
-            margin: 10px 0;
+        #header-right {
             display: flex;
             align-items: center;
+        }
+
+        /* Custom Icons for Buttons */
+        #notification-btn,
+        #search-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-left: 20px;
+        }
+
+        #notification-btn img,
+        #search-btn img {
+            width: 24px;
+            height: 24px;
+        }
+
+        #search-input {
+            display: none;
+            padding: 5px;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        /* Channels Section */
+        #channels-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2 columns */
+            gap: 20px;
+            padding: 20px;
             justify-content: center;
         }
-        #quality-selector select {
-            padding: 5px;
-            border: 1px solid white;
-            border-radius: 5px;
-            background-color: black;
-            color: white;
-            font-size: 16px;
-            margin-right: 10px; /* Space between dropdown and button */
-        }
 
-        /* Telegram Join Button */
-        #telegram-button {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        /* Scrolling Line at the Bottom */
-        #scrolling-line {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background-color: #333;
-            color: white;
+        .channel-box {
+            text-align: center;
+            background-color: #fff; /* White background for channel boxes */
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             padding: 10px;
-            text-align: center;
-            font-size: 16px;
-            overflow: hidden;
-            white-space: nowrap;
-        }
-        #scrolling-line p {
-            display: inline-block;
-            animation: scroll-line 10s linear infinite;
         }
 
-        /* Animation for Scrolling Text */
-        @keyframes scroll-line {
-            0% {
-                transform: translateX(100%);
-            }
-            100% {
-                transform: translateX(-100%);
-            }
-        }
-
-        /* Box for Embed Link */
-        #embed-box {
-            position: fixed;
-            bottom: 40px; /* Adjust this value based on how much space you want between the box and the scrolling line */
+        .channel-logo {
             width: 100%;
-            background-color: #444;
-            padding: 15px;
-            text-align: center;
-            border-top: 2px solid white;
-            box-sizing: border-box;
-            z-index: 999;
+            height: 100px;
+            object-fit: contain;
+            border-radius: 8px;
         }
 
-        /* Style the Elfsight Embed */
-        .elfsight-app-0abefba3-c06a-4c77-bf6a-98b1c30d2ff8 {
-            max-width: 100%;
-            margin: 0 auto;
+        .channel-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        /* Notification Popup */
+        #notifications {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            background-color: #fff;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: none;
+        }
+
+        /* Search Animation */
+        @keyframes slideIn {
+            from {
+                width: 0;
+            }
+            to {
+                width: 200px;
+            }
+        }
+
+        /* Search Input Animation */
+        #search-input.show {
+            display: block;
+            animation: slideIn 0.5s ease-in-out;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.0/dist/hls.min.js"></script>
 </head>
 <body>
 
-<!-- Full-Screen Popup -->
-<div id="popup">
-    <p>Join our Telegram channel <a href="https://t.me/SportsLiveLink18" target="_blank" style="color: lightblue; text-decoration: none;">@SportsLive18</a> for more links!</p>
-    <button id="join-now" onclick="joinNow()">Join Now</button>
-    <button id="already-joined" onclick="closePopup()">Already Joined</button>
-</div>
-
 <!-- Header -->
-<div id="header">Niet Sports Live</div>
-
-<!-- Video Streaming Section -->
-<div id="streaming-container">
-    <video id="videoPlayer" controls></video>
-    <div id="quality-selector">
-        <label for="quality">Select Quality: </label>
-        <select id="quality" onchange="changeQuality()">
-            <option value="-1" selected>Auto</option>
-        </select>
-        <!-- Telegram Join Button -->
-        <button id="telegram-button" onclick="joinTelegram()">Join Telegram</button>
+<div id="header">
+    <img id="logo" src="Nlogopng-removebg-preview.png" alt="NietLive Logo"> <!-- Upload your logo here -->
+    <div id="header-right">
+        <button id="notification-btn" onclick="toggleNotifications()">
+            <img src="images__1_-removebg-preview.png" alt="Notifications"> <!-- Upload your custom notification icon -->
+        </button>
+        <button id="search-btn" onclick="toggleSearch()">
+            <img src="images-removebg-preview.png" alt="Search"> <!-- Upload your custom search icon -->
+        </button>
+        <input type="text" id="search-input" placeholder="Search channels..." oninput="filterChannels()">
     </div>
 </div>
 
-<!-- Elfsight Embed Box -->
-<div id="embed-box">
-    <!-- Elfsight Visitor Counter Embed Code -->
-    <script src="https://static.elfsight.com/platform/platform.js" async></script>
-    <div class="elfsight-app-0abefba3-c06a-4c77-bf6a-98b1c30d2ff8" data-elfsight-app-lazy></div>
+<!-- Notifications -->
+<div id="notifications">
+    <h3>Notifications</h3>
+    <ul>
+        <li>New content available!</li>
+        <li>Star Sports is live now!</li>
+        <!-- Add more notifications as required -->
+    </ul>
 </div>
 
-<!-- Scrolling Line -->
-<div id="scrolling-line">
-    <p>⚠️ Stay updated with the latest cricket news and events! ⚠️</p>
+<!-- Channels Section -->
+<div id="channels-container">
+    <!-- Channel 1 -->
+    <div class="channel-box">
+        <a href="starSports.html"> <!-- Link to the new HTML page for Star Sports -->
+            <img class="channel-logo" src="https://www.sportspro.com/wp-content/uploads/2023/03/Star-Sports.webp" alt="Star Sports">
+            <div class="channel-name">Star Sports</div>
+        </a>
+    </div>
+    <!-- Channel 2 -->
+    <div class="channel-box">
+        <a href="sonyTen.html"> <!-- Link to the new HTML page for Sony Ten -->
+            <img class="channel-logo" src="channel_logo2_url" alt="Sony Ten">
+            <div class="channel-name">Sony Ten</div>
+        </a>
+    </div>
+    <!-- Channel 3 -->
+    <div class="channel-box">
+        <a href="espn.html"> <!-- Link to the new HTML page for ESPN -->
+            <img class="channel-logo" src="channel_logo3_url" alt="ESPN">
+            <div class="channel-name">ESPN</div>
+        </a>
+    </div>
+    <!-- Channel 4 -->
+    <div class="channel-box">
+        <a href="foxSports.html"> <!-- Link to the new HTML page for Fox Sports -->
+            <img class="channel-logo" src="channel_logo4_url" alt="Fox Sports">
+            <div class="channel-name">Fox Sports</div>
+        </a>
+    </div>
+    <!-- Add more channel boxes as needed -->
 </div>
 
 <script>
-    const video = document.getElementById('videoPlayer');
-    const qualitySelector = document.getElementById('quality');
-    const hls = new Hls();
+    // Sample channel data
+    const channels = [
+        { name: "Star Sports", logo: "https://www.sportspro.com/wp-content/uploads/2023/03/Star-Sports.webp", page: "starSports.html" },
+        { name: "Sony Ten", logo: "channel_logo2_url", page: "sonyTen.html" },
+        { name: "ESPN", logo: "channel_logo3_url", page: "espn.html" },
+        { name: "Fox Sports", logo: "channel_logo4_url", page: "foxSports.html" },
+        // Add more channels here
+    ];
 
-    // Function to get the URL parameter
-    function getQueryParam(param) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(param);
+    // Function to toggle the search input visibility
+    function toggleSearch() {
+        const searchInput = document.getElementById('search-input');
+        searchInput.classList.toggle('show');
+        document.getElementById('search-btn').innerHTML = searchInput.classList.contains('show') ? 
+            '<img src="images__2_-removebg-preview (1).png" alt="Cancel"> <!-- Upload your cancel icon -->' : 
+            '<img src="images-removebg-preview.png" alt="Search">'; // Change the icon to cancel when search is active
     }
 
-    // Get HLS URL from query parameter
-    const hlsUrl = getQueryParam('url');
+    // Function to filter channels based on search input
+    function filterChannels() {
+        const query = document.getElementById('search-input').value.toLowerCase();
+        const filteredChannels = channels.filter(channel => channel.name.toLowerCase().startsWith(query));
 
-    if (hlsUrl) {
-        // Initialize HLS.js
-        if (Hls.isSupported()) {
-            hls.loadSource(hlsUrl);
-            hls.attachMedia(video);
+        // Clear existing channel boxes
+        const container = document.getElementById('channels-container');
+        container.innerHTML = '';
 
-            // Populate Quality Levels
-            hls.on(Hls.Events.MANIFEST_PARSED, function () {
-                const levels = hls.levels;
-                levels.forEach((level, index) => {
-                    const option = document.createElement('option');
-                    option.value = index;
-                    option.textContent = `${level.height}p`; // Quality in resolution
-                    qualitySelector.appendChild(option);
-                });
-            });
-
-            // Handle Quality Change
-            function changeQuality() {
-                const quality = parseInt(qualitySelector.value);
-                if (quality === -1) {
-                    hls.currentLevel = -1; // Auto Quality
-                } else {
-                    hls.currentLevel = quality; // Set selected quality
-                }
-            }
-        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            // Native HLS Support (e.g., Safari)
-            video.src = hlsUrl;
-        }
-    } else {
-        alert("No URL provided. Please add '?url=your_hls_link.m3u8' to the URL.");
+        // Create new channel boxes based on search result
+        filteredChannels.forEach(channel => {
+            const channelBox = document.createElement('div');
+            channelBox.classList.add('channel-box');
+            channelBox.innerHTML = `
+                <a href="${channel.page}">
+                    <img class="channel-logo" src="${channel.logo}" alt="${channel.name}">
+                    <div class="channel-name">${channel.name}</div>
+                </a>
+            `;
+            container.appendChild(channelBox);
+        });
     }
 
-    // Function to handle "Join Now" button
-    function joinNow() {
-        window.open('https://t.me/CricketSparx', '_blank');
-    }
-
-    // Function to close the popup
-    function closePopup() {
-        const popup = document.getElementById('popup');
-        popup.style.display = 'none';
-    }
-
-    // Function to open Telegram channel
-    function joinTelegram() {
-        window.open('https://t.me/CricketSparx', '_blank');
+    // Function to toggle notifications
+    function toggleNotifications() {
+        const notifications = document.getElementById('notifications');
+        notifications.style.display = notifications.style.display === 'block' ? 'none' : 'block';
     }
 </script>
 
